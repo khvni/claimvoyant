@@ -87,3 +87,9 @@ Thumbs.db
 tmp/
 temp/
 *.tmp
+
+# Internal documentation (temporary guides)
+*_GUIDE.md
+*_guide.md
+NOTES.md
+TODO.md
