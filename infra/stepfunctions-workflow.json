@@ -1,0 +1,179 @@
+{
+  "Comment": "Claimvoyant Multi-Agent Claims Processing Workflow",
+  "StartAt": "IntakeAgent",
+  "States": {
+    "IntakeAgent": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::lambda:invoke",
+      "Parameters": {
+        "FunctionName": "claimvoyant-intake",
+        "Payload.$": "$"
+      },
+      "ResultPath": "$",
+      "ResultSelector": {
+        "statusCode.$": "$.Payload.statusCode",
+        "claim_id.$": "$.Payload.claim_id",
+        "bucket.$": "$.Payload.bucket",
+        "key.$": "$.Payload.key",
+        "extracted_data.$": "$.Payload.extracted_data",
+        "entities.$": "$.Payload.entities"
+      },
+      "Retry": [
+        {
+          "ErrorEquals": [
+            "Lambda.ServiceException",
+            "Lambda.AWSLambdaException",
+            "Lambda.SdkClientException"
+          ],
+          "IntervalSeconds": 2,
+          "MaxAttempts": 3,
+          "BackoffRate": 2
+        }
+      ],
+      "Catch": [
+        {
+          "ErrorEquals": ["States.ALL"],
+          "ResultPath": "$.error",
+          "Next": "ProcessingFailed"
+        }
+      ],
+      "Next": "PolicyAgent"
+    },
+    "PolicyAgent": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::lambda:invoke",
+      "Parameters": {
+        "FunctionName": "claimvoyant-policy",
+        "Payload.$": "$"
+      },
+      "ResultPath": "$",
+      "ResultSelector": {
+        "statusCode.$": "$.Payload.statusCode",
+        "claim_id.$": "$.Payload.claim_id",
+        "policy_number.$": "$.Payload.policy_number",
+        "policy_data.$": "$.Payload.policy_data",
+        "entities.$": "$.Payload.entities",
+        "extracted_data.$": "$.Payload.extracted_data"
+      },
+      "Retry": [
+        {
+          "ErrorEquals": [
+            "Lambda.ServiceException",
+            "Lambda.AWSLambdaException",
+            "Lambda.SdkClientException"
+          ],
+          "IntervalSeconds": 2,
+          "MaxAttempts": 3,
+          "BackoffRate": 2
+        }
+      ],
+      "Catch": [
+        {
+          "ErrorEquals": ["States.ALL"],
+          "ResultPath": "$.error",
+          "Next": "ProcessingFailed"
+        }
+      ],
+      "Next": "ParallelAssessment"
+    },
+    "ParallelAssessment": {
+      "Type": "Parallel",
+      "Branches": [
+        {
+          "StartAt": "DamageAgent",
+          "States": {
+            "DamageAgent": {
+              "Type": "Task",
+              "Resource": "arn:aws:states:::lambda:invoke",
+              "Parameters": {
+                "FunctionName": "claimvoyant-damage",
+                "Payload.$": "$"
+              },
+              "ResultSelector": {
+                "damage_assessment.$": "$.Payload.damage_assessment"
+              },
+              "End": true
+            }
+          }
+        },
+        {
+          "StartAt": "ValuationAgent",
+          "States": {
+            "ValuationAgent": {
+              "Type": "Task",
+              "Resource": "arn:aws:states:::lambda:invoke",
+              "Parameters": {
+                "FunctionName": "claimvoyant-valuation",
+                "Payload.$": "$"
+              },
+              "ResultSelector": {
+                "valuation.$": "$.Payload.valuation"
+              },
+              "End": true
+            }
+          }
+        }
+      ],
+      "ResultPath": "$.parallel_results",
+      "Next": "MergeResults"
+    },
+    "MergeResults": {
+      "Type": "Pass",
+      "Parameters": {
+        "claim_id.$": "$.claim_id",
+        "policy_number.$": "$.policy_number",
+        "policy_data.$": "$.policy_data",
+        "entities.$": "$.entities",
+        "extracted_data.$": "$.extracted_data",
+        "damage_assessment.$": "$.parallel_results[0].damage_assessment",
+        "valuation.$": "$.parallel_results[1].valuation"
+      },
+      "Next": "DecisionAgent"
+    },
+    "DecisionAgent": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::lambda:invoke",
+      "Parameters": {
+        "FunctionName": "claimvoyant-decision",
+        "Payload.$": "$"
+      },
+      "ResultPath": "$",
+      "ResultSelector": {
+        "statusCode.$": "$.Payload.statusCode",
+        "claim_id.$": "$.Payload.claim_id",
+        "version.$": "$.Payload.version",
+        "decision.$": "$.Payload.decision",
+        "decision_data.$": "$.Payload.decision_data",
+        "report_s3_key.$": "$.Payload.report_s3_key"
+      },
+      "Retry": [
+        {
+          "ErrorEquals": [
+            "Lambda.ServiceException",
+            "Lambda.AWSLambdaException",
+            "Lambda.SdkClientException"
+          ],
+          "IntervalSeconds": 2,
+          "MaxAttempts": 3,
+          "BackoffRate": 2
+        }
+      ],
+      "Catch": [
+        {
+          "ErrorEquals": ["States.ALL"],
+          "ResultPath": "$.error",
+          "Next": "ProcessingFailed"
+        }
+      ],
+      "Next": "ProcessingComplete"
+    },
+    "ProcessingComplete": {
+      "Type": "Succeed"
+    },
+    "ProcessingFailed": {
+      "Type": "Fail",
+      "Error": "ClaimProcessingFailed",
+      "Cause": "An error occurred during claim processing"
+    }
+  }
+}
