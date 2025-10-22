@@ -1,0 +1,36 @@
+# Gitleaks configuration
+title = "Claimvoyant Secret Scanning"
+
+[extend]
+useDefault = true
+
+[[rules]]
+id = "aws-access-key"
+description = "AWS Access Key ID"
+regex = '''(A3T[A-Z0-9]|AKIA|AGPA|AIDA|AROA|AIPA|ANPA|ANVA|ASIA)[A-Z0-9]{16}'''
+tags = ["key", "AWS"]
+
+[[rules]]
+id = "aws-secret-key"
+description = "AWS Secret Access Key"
+regex = '''(?i)aws(.{0,20})?(?-i)['\"][0-9a-zA-Z\/+]{40}['\"]'''
+tags = ["key", "AWS"]
+
+[[rules]]
+id = "weaviate-api-key"
+description = "Weaviate API Key"
+regex = '''(?i)weaviate(.{0,20})?['\"][0-9a-zA-Z\-]{32,}['\"]'''
+tags = ["key", "Weaviate"]
+
+[[rules]]
+id = "generic-api-key"
+description = "Generic API Key"
+regex = '''(?i)(api_key|apikey|api-key)(.{0,20})?['\"][0-9a-zA-Z\-_]{32,}['\"]'''
+tags = ["key", "API"]
+
+[allowlist]
+description = "Allowlist for false positives"
+paths = [
+  '''^\.gitleaks\.toml$''',
+  '''(.*?)(jpg|gif|doc|pdf|bin|svg|socket)$''',
+]
