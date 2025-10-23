@@ -36,7 +36,8 @@ deploy_lambda() {
     echo "${GREEN}Deploying ${FUNCTION_NAME}...${NC}"
 
     # Create deployment package
-    cd "${FUNCTION_DIR}"
+    local CURRENT_DIR=$(pwd)
+    cd "${CURRENT_DIR}/${FUNCTION_DIR}"
 
     # Create a clean zip file
     rm -f function.zip
@@ -45,9 +46,9 @@ deploy_lambda() {
     zip -q function.zip lambda_function.py
 
     # Add dependencies from virtual environment
-    if [ -d "../../venv/lib/python3.13/site-packages" ]; then
-        cd ../../venv/lib/python3.13/site-packages
-        zip -qr -u "${FUNCTION_DIR}/function.zip" \
+    if [ -d "${CURRENT_DIR}/venv/lib/python3.13/site-packages" ]; then
+        cd "${CURRENT_DIR}/venv/lib/python3.13/site-packages"
+        zip -qr -u "${CURRENT_DIR}/${FUNCTION_DIR}/function.zip" \
             boto3* \
             botocore* \
             weaviate* \
@@ -61,10 +62,10 @@ deploy_lambda() {
             sniffio* \
             idna* \
             2>/dev/null || echo "  (Some dependencies not found, Lambda may use built-in versions)"
-        cd -
+        cd "${CURRENT_DIR}"
     fi
 
-    cd "${FUNCTION_DIR}"
+    cd "${CURRENT_DIR}/${FUNCTION_DIR}"
 
     # Check if function exists
     if aws lambda get-function --function-name "${FUNCTION_NAME}" --region "${AWS_REGION}" 2>/dev/null; then
@@ -105,7 +106,7 @@ deploy_lambda() {
     # Clean up
     rm -f function.zip
 
-    cd - > /dev/null
+    cd "${CURRENT_DIR}" > /dev/null
 
     echo ""
 }
