@@ -7,10 +7,10 @@
 ### Phase 0-6: Infrastructure Setup
 - [x] **AWS CLI**: Installed and configured (v2.31.19)
 - [x] **S3 Buckets**: 4 buckets created with versioning & encryption
-  - `claimvoyant-212284023507-raw-claims`
-  - `claimvoyant-212284023507-processed`
-  - `claimvoyant-212284023507-reports`
-  - `claimvoyant-212284023507-policies`
+  - `claimvoyant-YOUR_AWS_ACCOUNT_ID-raw-claims`
+  - `claimvoyant-YOUR_AWS_ACCOUNT_ID-processed`
+  - `claimvoyant-YOUR_AWS_ACCOUNT_ID-reports`
+  - `claimvoyant-YOUR_AWS_ACCOUNT_ID-policies`
 - [x] **DynamoDB Tables**: 2 tables with PITR
   - `Claims` (claim_id + version)
   - `AuditLog` (log_id + timestamp)

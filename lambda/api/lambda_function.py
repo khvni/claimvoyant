@@ -6,6 +6,7 @@ Uses pure Python with boto3 only.
 import json
 import os
 from datetime import datetime
+
 import boto3
 
 # AWS clients
@@ -60,9 +61,7 @@ def handler(event, context):
             return handle_upload_claim(event)
 
         else:
-            return response(
-                404, {"error": "Not found", "path": path, "method": http_method}
-            )
+            return response(404, {"error": "Not found", "path": path, "method": http_method})
 
     except Exception as e:
         print(f"Error: {str(e)}")

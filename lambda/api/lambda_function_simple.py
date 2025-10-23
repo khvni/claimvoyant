@@ -6,6 +6,7 @@ Uses pure Python with boto3 only.
 import json
 import os
 from datetime import datetime
+
 import boto3
 
 # AWS clients
@@ -43,7 +44,18 @@ def handler(event, context):
 
         # Parse request
         http_method = event.get("requestContext", {}).get("http", {}).get("method", "GET")
-        path = event.get("rawPath", "/")
+        raw_path = event.get("rawPath", "/")
+
+        # Strip stage prefix if present (e.g., /prod/ -> /)
+        path = raw_path
+        if path.startswith("/prod/"):
+            path = path[5:]  # Remove '/prod'
+        elif path.startswith("/prod"):
+            path = path[5:] or "/"
+
+        # Ensure path starts with /
+        if not path.startswith("/"):
+            path = "/" + path
 
         # Route handling
         if path == "/" and http_method == "GET":
@@ -60,9 +72,7 @@ def handler(event, context):
             return handle_upload_claim(event)
 
         else:
-            return response(
-                404, {"error": "Not found", "path": path, "method": http_method}
-            )
+            return response(404, {"error": "Not found", "path": path, "method": http_method})
 
     except Exception as e:
         print(f"Error: {str(e)}")

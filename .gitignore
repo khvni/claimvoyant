@@ -93,3 +93,15 @@ temp/
 *_guide.md
 NOTES.md
 TODO.md
+
+# AWS Configuration (contains account-specific info)
+.aws-config
+.api-endpoint
+.api-gateway-id
+
+# Lambda deployment artifacts
+lambda/**/function.zip
+*.zip
+
+# Claude Code settings (may contain secrets)
+.claude/
