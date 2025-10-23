@@ -1,0 +1,6 @@
+AWS_ACCOUNT_ID=212284023507
+AWS_REGION=us-east-1
+BUCKET_PREFIX=claimvoyant-212284023507
+WEAVIATE_URL=https://tmntz16t4cedygax3xyya.c0.us-east1.gcp.weaviate.cloud
+LAMBDA_ROLE_ARN=arn:aws:iam::212284023507:role/ClaimvoyantLambdaExecutionRole
+STEPFUNCTIONS_ROLE_ARN=arn:aws:iam::212284023507:role/ClaimvoyantStepFunctionsRole
