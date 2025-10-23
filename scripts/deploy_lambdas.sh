@@ -45,6 +45,12 @@ deploy_lambda() {
     # Add Lambda function code
     zip -q function.zip lambda_function.py
 
+    # Add shared code if exists
+    if [ -d "${CURRENT_DIR}/src/shared" ]; then
+        cd "${CURRENT_DIR}/src"
+        zip -qr "${CURRENT_DIR}/${FUNCTION_DIR}/function.zip" shared/
+    fi
+
     # Add dependencies from virtual environment
     if [ -d "${CURRENT_DIR}/venv/lib/python3.13/site-packages" ]; then
         cd "${CURRENT_DIR}/venv/lib/python3.13/site-packages"
@@ -115,12 +121,12 @@ deploy_lambda() {
 echo "Starting Lambda deployment..."
 echo ""
 
-deploy_lambda "claimvoyant-intake" "lambda/intake" "lambda_function.lambda_handler" 180 1024
-deploy_lambda "claimvoyant-policy" "lambda/policy" "lambda_function.lambda_handler" 60 512
-deploy_lambda "claimvoyant-damage" "lambda/damage" "lambda_function.lambda_handler" 60 512
-deploy_lambda "claimvoyant-valuation" "lambda/valuation" "lambda_function.lambda_handler" 60 512
-deploy_lambda "claimvoyant-decision" "lambda/decision" "lambda_function.lambda_handler" 120 1024
-deploy_lambda "claimvoyant-api" "lambda/api" "lambda_function.handler" 30 512
+deploy_lambda "claimvoyant-intake" "src/functions/intake" "lambda_function.lambda_handler" 180 1024
+deploy_lambda "claimvoyant-policy" "src/functions/policy" "lambda_function.lambda_handler" 60 512
+deploy_lambda "claimvoyant-damage" "src/functions/damage" "lambda_function.lambda_handler" 60 512
+deploy_lambda "claimvoyant-valuation" "src/functions/valuation" "lambda_function.lambda_handler" 60 512
+deploy_lambda "claimvoyant-decision" "src/functions/decision" "lambda_function.lambda_handler" 120 1024
+deploy_lambda "claimvoyant-api" "src/functions/api" "lambda_function_simple.handler" 30 512
 
 echo "${GREEN}========================================"
 echo "Lambda Deployment Complete!"

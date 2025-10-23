@@ -100,7 +100,7 @@ TODO.md
 .api-gateway-id
 
 # Lambda deployment artifacts
-lambda/**/function.zip
+src/functions/**/function.zip
 *.zip
 
 # Claude Code settings (may contain secrets)

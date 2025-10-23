@@ -47,24 +47,34 @@ Valuation Agent ←────┴────→ Decision Agent
 
 ```
 claimvoyant/
-├── lambda/
-│   ├── intake/         # Textract + Rekognition for data extraction
-│   ├── policy/         # Weaviate RAG for policy retrieval
-│   ├── damage/         # Damage assessment (placeholder for CV)
-│   ├── valuation/      # Vehicle valuation (placeholder for KBB API)
-│   ├── decision/       # Bedrock Claude for claim decision
-│   └── api/            # FastAPI REST API
-├── scripts/
-│   ├── aws_configure.sh           # AWS CLI setup wizard
-│   ├── init_weaviate.py           # Weaviate collection initialization
-│   └── setup_aws_infrastructure.sh # AWS resource provisioning
-├── infra/              # Infrastructure as Code (CloudFormation/CDK)
-├── tests/              # Unit and integration tests
-├── frontend/           # Next.js application (to be created)
-├── requirements.txt    # Production dependencies
-├── requirements-dev.txt # Development dependencies
-├── pyproject.toml      # Python tooling config
-└── AWS_SETUP_GUIDE.md  # Detailed setup instructions
+├── src/
+│   ├── shared/              # Shared utilities and common code
+│   │   ├── config/          # Configuration management
+│   │   ├── utils/           # Utility functions
+│   │   └── models/          # Data models (Pydantic)
+│   └── functions/           # Lambda functions
+│       ├── api/             # REST API endpoint
+│       ├── intake/          # Textract + Rekognition extraction
+│       ├── policy/          # Weaviate RAG policy retrieval
+│       ├── damage/          # Damage assessment (placeholder)
+│       ├── valuation/       # Vehicle valuation (placeholder)
+│       └── decision/        # Bedrock Claude decision engine
+├── infrastructure/          # Infrastructure as Code
+│   └── stepfunctions/       # Step Functions state machines
+├── scripts/                 # Deployment and utility scripts
+│   ├── setup_aws_infrastructure.sh
+│   ├── deploy_lambdas.sh
+│   ├── test_e2e.sh
+│   └── init_weaviate.py
+├── tests/                   # Unit and integration tests
+├── docs/                    # Documentation
+│   ├── AWS_SETUP_GUIDE.md
+│   ├── DEPLOYMENT_SUMMARY.md
+│   └── PROGRESS.md
+├── requirements.txt         # Production dependencies
+├── requirements-dev.txt     # Development dependencies
+├── pyproject.toml           # Python tooling config
+└── CLAUDE.md                # Repository context for Claude
 ```
 
 ## Quick Start
